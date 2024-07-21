@@ -1,0 +1,35 @@
+En esta version se desarrollara el sistema
+donde recivira un mensaje si la respuesta 
+del M10 fue OK
+
+
+Esta version es una copia de 3G_v5_Menu
+
+
+
+1 -> Verificar que llego el comando OK, si 
+	no llego el comando OK intentarlo de nuevo. 
+
+/-----------------------------------------------////
+
+Salidas del Menu
+
+#1 <Numero de destino>*
+*1 ACK Numero de destino 3137854362
+
+#2 
+*2 ACK No hay Datos
+       Lectura completa
+
+#3
+*3 ACK <fecha y hora>
+
+#4
+*4 ACK NO hay Datos
+       Datos eliminados
+
+#7 <Clave AES>
+*7 ACK Clave guardada exitosamente
+
+#8 <Vector de inicializacion>
+*8 ACK Vector de inicializacion guardad exitosamente
