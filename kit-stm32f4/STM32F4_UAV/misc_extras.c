@@ -19,6 +19,9 @@ __IO uint32_t AsynchPrediv = 0, SynchPrediv = 0;
 char buffer[80];
 uint32_t subsec = 0;
 
+extern uint16_t conaileron;
+extern uint16_t conelevator;
+
 void InitializeLEDs(){	
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);
@@ -200,7 +203,8 @@ void config_ADC()
    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
+  
+   ADC_DeInit();
   
 #ifdef DMA
   
@@ -223,12 +227,11 @@ void config_ADC()
    
 #endif
    
-   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_5;
    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-#ifdef DMA
 
    ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
    ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div2;
@@ -236,13 +239,12 @@ void config_ADC()
    ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
    ADC_CommonInit(&ADC_CommonInitStructure);
    
-#endif
  
  // Configure ADC1 Channel 7  PA7
  
    ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
-   ADC_InitStructure.ADC_ScanConvMode = DISABLE;   
-   ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+   ADC_InitStructure.ADC_ScanConvMode = ENABLE;   
+   ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
 #ifdef DMA
    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 #else
@@ -250,12 +252,11 @@ void config_ADC()
 #endif
    ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;   
    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-   ADC_InitStructure.ADC_NbrOfConversion = 1;
+   ADC_InitStructure.ADC_NbrOfConversion = 2;
    ADC_Init(ADC1, &ADC_InitStructure);
-   ADC_Init(ADC2, &ADC_InitStructure);
    
-   ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 1, ADC_SampleTime_3Cycles);
-   //ADC_RegularChannelConfig(ADC2, ADC_Channel_6, 2, ADC_SampleTime_3Cycles);
+   ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SampleTime_3Cycles);
+   ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 2, ADC_SampleTime_3Cycles);
 
 #ifdef DMA   
    ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);   
@@ -263,27 +264,21 @@ void config_ADC()
 #endif 
    
    ADC_Cmd(ADC1,ENABLE);
-   ADC_Cmd(ADC2,ENABLE);
-  
 }
 
-uint32_t readData_ADC1(){
+uint32_t readData_ADC(){
 
 #ifdef DMA  
   ADC_Voltage = ADC_Value*3300/0xFFF;
   return ADC_Voltage;
 #else
-     while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
-     return (uint32_t)(ADC_GetConversionValue(ADC1)*3300/0xFFF);
+     ADC_SoftwareStartConv(ADC1);
+     while(ADC_GetSoftwareStartConvStatus(ADC1) != RESET){};
+     conelevator = (uint16_t)(ADC_GetConversionValue(ADC1)*3300/0xFFF);
+     ADC_SoftwareStartConv(ADC1);
+     conaileron = (uint16_t)(ADC_GetConversionValue(ADC1)*3300/0xFFF);
 #endif
-  
-}
-
-uint32_t readData_ADC2(){
-
-     //while (!ADC_GetFlagStatus(ADC2, ADC_FLAG_EOC));
-     //return (uint32_t)(ADC_GetConversionValue(ADC2)*3300/0xFFF);
-     return 0;
+  return 0;
 }
 
 uint8_t parseData(const char *data1, uint8_t len1, const char *data2){

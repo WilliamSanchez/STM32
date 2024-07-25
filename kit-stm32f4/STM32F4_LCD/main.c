@@ -34,12 +34,10 @@ uint8_t contDelay = 20;
 
 int main(void){
 
-    Init_SPI();
     InitializeLEDs();
-    configUSART_1();
-    delay_init();
     Init_I2C1();
-    begin_RTC(00, 00, 00);
+    serialPC();
+    delay_init();
     LCD_Init();
     configButton();
     configButton_mode();
@@ -57,6 +55,8 @@ int main(void){
         delay(50); clearDisplay();
         drawLetter(&contDelay);
         display();  //2
+        sprintf((char*)trasmitData,"CONT %d\r\n", contDelay);
+        sendData((char*)trasmitData);
         GPIO_ResetBits(GPIOC,GPIO_Pin_13);
         delay(50);
       }

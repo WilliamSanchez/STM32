@@ -7,7 +7,8 @@
 
 static uint8_t buffer[CACHE_SIZE_MEM];
 extern uint8_t contDelay;
-extern uint8_t conelevator;
+extern uint16_t conaileron;
+extern uint16_t conelevator;
 void LCD_Init(){
 
     I2C_WriteReg(0xAE);
@@ -94,11 +95,11 @@ void drawLetter(uint8_t *elevator){
      	buffer[i]=0x0F;	buffer[7*128+7+i]=0xF0; 
    }
    /////////////////////////////////////
-   
-   conelevator = (uint8_t)(48*readData_ADC1()/3300);
-   
-   uint64_t indc = 0x00ff000000000000>>conelevator;
-   uint64_t indc2 = ~(0x0000ffffffffffff>>conelevator);
+    
+    readData_ADC(); 
+      
+   uint64_t indc = 0x00ff000000000000>>(uint8_t)(48*conaileron/3300);
+   uint64_t indc2 = ~(0x0000ffffffffffff>>contDelay);
    uint64_t indc3 = 0xfff1e18181e1f1ff;
    uint64_t indc4 = 0x00007e7e7e7e0000;
    uint64_t indc5 = 0xffe7c38181818181;
@@ -106,8 +107,8 @@ void drawLetter(uint8_t *elevator){
    uint64_t col1 = 0x0000ffffffffffff;
    uint64_t col2 = 0x0000800000000001;
     
-   uint8_t cont = 40+contDelay;
-   uint8_t cont2 = 40+contDelay;
+   uint8_t cont = 40+(uint8_t)(42*conelevator/3300);
+   uint8_t cont2 = 40+(uint8_t)(42*conelevator/3300);
     
    for(int i=0; i<8; i++)
    {

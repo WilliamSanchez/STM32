@@ -30,8 +30,8 @@ uint8_t mode =0;
 uint8_t changeMode[16];
 uint8_t changeDelay[16];
 uint8_t contDelay = 20;
-uint8_t conelevator = 0;
-
+uint16_t conelevator = 0;
+uint16_t conaileron = 0;
 
 int main(void){
 
@@ -58,7 +58,7 @@ int main(void){
         delay(50); clearDisplay();
         drawLetter(&contDelay);
         display();  //2
-        sprintf((char*)trasmitData,"Elevator %d | CONT %d\r\n",conelevator, contDelay);
+        sprintf((char*)trasmitData,"Elevator %d | Aileron %d | CONT %d\r\n",conelevator, conaileron, contDelay);
         sendData((char*)trasmitData);
         GPIO_ResetBits(GPIOC,GPIO_Pin_13);
         delay(50);

@@ -9,6 +9,7 @@
 void serialPC();
 
 void config_ADC();
+void config_ADC2();
 uint32_t readData_ADC1();
 uint32_t readData_ADC2();
 

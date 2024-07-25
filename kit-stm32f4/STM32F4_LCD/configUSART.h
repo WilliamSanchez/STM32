@@ -4,7 +4,7 @@
 #include <stm32f4xx.h>
 #include "misc.h"
 
-void configUSART_1();
+void serialPC();
 void configUSART_2();
 
 

@@ -30,8 +30,7 @@ void configButton_mode();
 void configButton_delay();
 
 void config_ADC();
-uint32_t readData_ADC1();
-uint32_t readData_ADC2();
+uint32_t readData_ADC();
 
 uint8_t parseData(const char *data1, uint8_t len1, const char *data2);
 void sendData(const char *data);

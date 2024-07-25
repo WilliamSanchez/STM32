@@ -22,7 +22,7 @@ char dataMode[225] = "XXXX";
 
 volatile int numero = 0;
 uint8_t trasmitData[255];
-uint8_t trasmitDataS[255];
+//uint8_t trasmitDataS[255];
 uint8_t dataTime[255];
 uint8_t mode =0;
 uint8_t changeMode[16];
@@ -42,8 +42,9 @@ int main(void){
     {
         GPIO_SetBits(GPIOC,GPIO_Pin_13);
         delay(50);
-        sprintf((char*)trasmitData,"The date is %lu %lu\r\n",readData_ADC1(), readData_ADC2());
-        sendData((char*)trasmitData);
+        //sprintf((char*)trasmitData,"The date is %lu %lu\r\n",readData_ADC1(), readData_ADC2());
+        //sendData((char*)trasmitData);
+        readData_ADC1();
         GPIO_ResetBits(GPIOC,GPIO_Pin_13);
         delay(50);
     }
