@@ -44,7 +44,6 @@ LDFLAGS += -Wl,--gc-sections -Wl,-Map=$(TARGET).map
 
 SRCS =  main.c stm32f4xx_it.c \
         syscalls.c \
-        configSPI.c \
 	misc_extras.c \
 	configUSART.c \
         configI2C.c \

@@ -6,9 +6,15 @@
 #define mask 0x00000000000000FF
 
 static uint8_t buffer[CACHE_SIZE_MEM];
-extern uint8_t contDelay;
+extern uint8_t contthrottle;
 extern uint16_t conaileron;
 extern uint16_t conelevator;
+extern uint16_t conrudder;
+extern uint8_t pinread;
+
+uint8_t cont;
+uint8_t cont2;
+
 void LCD_Init(){
 
     I2C_WriteReg(0xAE);
@@ -81,9 +87,49 @@ uint8_t display(){
 
 }
 
-void drawLetter(uint8_t *elevator){
+void drawLetter(){
 
-   //////////// 	Marco
+   uint64_t col1 = 0x0000ffffffffffff;
+   uint64_t col2 = 0x0000800000000001;
+   uint64_t cir1 = 0xc030080402020101;
+   uint64_t cir2 = 0x030c102040408080;
+   uint64_t cir3 = 0x01010202040830c0;
+   uint64_t cir4 = 0x8080404020100c03;
+
+   uint64_t masks = 0x00f0f0fcfcfcffff;
+   uint64_t maski = 0x000f0f3f7f7fffff;
+   uint64_t maska = 0xffff7f7f3f0f0f00;
+   uint64_t maskb = 0xfffffcfcfcf0f000;
+   
+   //pinread = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
+   if(!pinread){
+	masks = 0x00f0f0fcfcfcffff;
+   	maski = 0x000f0f3f7f7fffff;
+   	maska = 0xffff7f7f3f0f0f00;
+   	maskb = 0xfffffcfcfcf0f000;
+   }else{
+	masks =0;
+   	maski = 0;
+   	maska = 0;
+   	maskb = 0;
+   }
+ 
+      
+   uint64_t indc = 0x00ff000000000000>>(uint8_t)(48*conaileron/3300);
+   uint64_t indc2 = ~(0x0000ffffffffffff>>contthrottle);
+   uint64_t indc3 = 0xfff1e18181e1f1ff;
+   uint64_t indc4 = 0x00007e7e7e7e0000;
+   uint64_t indc5 = 0xffe7c38181818181;
+
+   if(pinread == 1) {
+      cont = 20+(uint8_t)(80*(3300 - conelevator-1)/3300);
+      conrudder = 3300/2;
+   }else{
+      conrudder = conelevator; conelevator = 3300/2;
+      cont2 = 20+(uint8_t)(80*(3300 - conrudder-1)/3300);
+  }
+
+   //////////// 	Marcok
    for(int i=0; i<8; i++)
    {
      	buffer[i*128+i]=0xFF;buffer[i*128+i+1]=0xFF;buffer[i*128+i+2]=0xFF;
@@ -96,19 +142,7 @@ void drawLetter(uint8_t *elevator){
    }
    /////////////////////////////////////
     
-    readData_ADC(); 
-      
-   uint64_t indc = 0x00ff000000000000>>(uint8_t)(48*conaileron/3300);
-   uint64_t indc2 = ~(0x0000ffffffffffff>>contDelay);
-   uint64_t indc3 = 0xfff1e18181e1f1ff;
-   uint64_t indc4 = 0x00007e7e7e7e0000;
-   uint64_t indc5 = 0xffe7c38181818181;
-   
-   uint64_t col1 = 0x0000ffffffffffff;
-   uint64_t col2 = 0x0000800000000001;
-    
-   uint8_t cont = 40+(uint8_t)(42*conelevator/3300);
-   uint8_t cont2 = 40+(uint8_t)(42*conelevator/3300);
+
     
    for(int i=0; i<8; i++)
    {
@@ -161,12 +195,25 @@ void drawLetter(uint8_t *elevator){
         buffer[6*128+6+i] = 0x81;
      }
      
+     if(i>(128-26+26)/2-12 && i<=(128-26+26)/2-4)
+     {
+        buffer[3*128+3+i] = (uint8_t)((cir3|maskb)>>(8*(i-((128-26+26)/2-12)-1))&mask);
+        buffer[4*128+4+i] = (uint8_t)((cir4|maska)>>(8*(i-((128-26+26)/2-12)-1))&mask);
+     }
+     
+     if(i>(128-26+26)/2-4 && i<=(128-26+26)/2+4)
+     {
+        buffer[3*128+3+i] = (uint8_t)((cir1|masks)>>(8*(i-((128-26+26)/2-4)-1))&mask);
+        buffer[4*128+4+i] = (uint8_t)((cir2|maski)>>(8*(i-((128-26+26)/2-4)-1))&mask);
+     }
+     
      if (i>cont2 && i<=cont2+8)
      	buffer[1*128+1+i] =  buffer[1*128+1+i]|(uint8_t)((indc4>>(8*(i-cont2-1)))&mask);     
      
      if (i>cont && i<=cont+8)
      	buffer[6*128+6+i] = buffer[6*128+6+i]|(uint8_t)((~indc3>>(8*(i-cont-1)))&mask);
    }
+   
 }
 
 

@@ -49,11 +49,8 @@
 /******************************************************************************/
 
 extern char txBuffer_1[];
-extern uint8_t changeMode[];
-extern char dataMode[];
-extern uint8_t mode;
-uint8_t cont = 0;
 extern uint8_t contDelay;
+extern uint8_t pinread;
 
 /**
   * @brief  This function handles NMI exception.
@@ -151,7 +148,8 @@ void EXTI0_IRQHandler(void)
 {
   if(EXTI_GetITStatus(EXTI_Line0) != RESET)
   {
-
+    delay(10);
+    pinread = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0);
     EXTI_ClearITPendingBit(EXTI_Line0);
   }
 }
@@ -167,8 +165,9 @@ void EXTI4_IRQHandler(void)
   if(EXTI_GetITStatus(EXTI_Line4) != RESET)
   {
     /* Toggle LED1 */
-    contDelay++;
     delay(10);
+    if(contDelay < 255)
+    	contDelay++;
     EXTI_ClearITPendingBit(EXTI_Line4);
   }
 }
@@ -186,8 +185,9 @@ void EXTI3_IRQHandler(void)
   
   if(EXTI_GetITStatus(EXTI_Line3) != RESET)
   {
-    contDelay--;
     delay(10);
+    if(contDelay != 0)
+    	contDelay--;
     EXTI_ClearITPendingBit(EXTI_Line3);
   }
 }
@@ -219,27 +219,6 @@ static int tx_index = 0;
     	    USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
 	   }
     }
-/*
-    if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) // Received characters modify string
-    {
-        char data1=USART_ReceiveData(USART1);
-        *(memoria1+rx_index++) = data1;
-	if(parseData((char*)memoria1, rx_index, "CMTI")){
-	   GPIO_ResetBits(GPIOE,GPIO_Pin_11); 
-	   rx_index = 0;
-	   rxCommand = 1;	   
-	   USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-           while ((USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET)); 
-        }
-	  else if(parseData((char*)memoria1, rx_index, "OK")){
-	   GPIO_ResetBits(GPIOE,GPIO_Pin_11); 
-	   rx_index = 0;
-	   rxData = 1;	   
-	   USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-           while ((USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET));		
-	}	
-    }
-*/
 }
 
 

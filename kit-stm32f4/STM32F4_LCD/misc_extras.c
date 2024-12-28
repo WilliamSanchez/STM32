@@ -23,14 +23,14 @@ void InitializeLEDs(){
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);
 	GPIO_InitTypeDef gpioStructure;
-	gpioStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_13;
+	
+	gpioStructure.GPIO_Pin = GPIO_Pin_13;
 	gpioStructure.GPIO_Mode = GPIO_Mode_OUT;
 	gpioStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB, &gpioStructure);
-	GPIO_WriteBit(GPIOB, GPIO_Pin_0 | GPIO_Pin_1, Bit_SET);
-
 	GPIO_Init(GPIOC, &gpioStructure);
 	GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);
+
+
 }
 
 void delay_init(void){
@@ -71,7 +71,7 @@ void delay_us(u32 micro_sec)
 	SysTick->VAL =0X00;       
 }
 
-void configButton(){
+void configButton_Rudder(){
   EXTI_InitTypeDef   EXTI_InitStructure;
   GPIO_InitTypeDef   GPIO_InitStructure;
   NVIC_InitTypeDef   NVIC_InitStructure;
@@ -93,7 +93,7 @@ void configButton(){
   /* Configure Button EXTI line */
   EXTI_InitStructure.EXTI_Line = EXTI_Line0;
   EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;  
   EXTI_InitStructure.EXTI_LineCmd = ENABLE;
   EXTI_Init(&EXTI_InitStructure);
   
@@ -107,7 +107,7 @@ void configButton(){
 }
 
 
-void configButton_mode() {
+void configButton_ThP() {
 
   EXTI_InitTypeDef   EXTI_InitStructure;
   GPIO_InitTypeDef   GPIO_InitStructure;
@@ -144,7 +144,7 @@ void configButton_mode() {
 
 }
 
-void configButton_delay() {
+void configButton_ThM() {
 
   EXTI_InitTypeDef   EXTI_InitStructure;
   GPIO_InitTypeDef   GPIO_InitStructure;

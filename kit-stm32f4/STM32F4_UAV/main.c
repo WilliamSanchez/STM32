@@ -12,9 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-
 #include "misc_extras.h"
-#include "configSPI.h"
 #include "configUSART.h"
 #include "lcdOLED.h"
 
@@ -24,45 +22,37 @@ char dataMode[225] = "XXXX";
 
 volatile int numero = 0;
 uint8_t trasmitData[255];
-uint8_t trasmitDataS[255];
-uint8_t dataTime[255];
-uint8_t mode =0;
-uint8_t changeMode[16];
-uint8_t changeDelay[16];
-uint8_t contDelay = 20;
+uint8_t contthrottle = 20;
 uint16_t conelevator = 0;
 uint16_t conaileron = 0;
+uint16_t conrudder = 0;
+uint8_t pinread = 0;
 
 int main(void){
 
-    Init_SPI();
+ 
     InitializeLEDs();
     serialPC();
     delay_init();
     Init_I2C1();
-    begin_RTC(00, 00, 00);
-    LCD_Init();
-    configButton();
-    configButton_mode();
-    configButton_delay();
+    configButton_ThM();
+    configButton_ThP();
+    configButton_Rudder();
     config_ADC();
     ADC_SoftwareStartConv(ADC1);    
     delay(1000);display();
     delay(1000);clearDisplay();
-    uint8_t contret = 0;
     while(1)
     {
-      contret = 10*contDelay;
-      while (contret > 0 ){
         GPIO_SetBits(GPIOC,GPIO_Pin_13);
         delay(50); clearDisplay();
-        drawLetter(&contDelay);
+        drawLetter();
         display();  //2
-        sprintf((char*)trasmitData,"Elevator %d | Aileron %d | CONT %d\r\n",conelevator, conaileron, contDelay);
+        // 	ELEVATOR 	\ 	AILERON 	\ 	RUDDER 	\ 	THROTTLE
+        sprintf((char*)trasmitData," %d %d %d %d",conaileron, conelevator, conrudder, contthrottle);
         sendData((char*)trasmitData);
         GPIO_ResetBits(GPIOC,GPIO_Pin_13);
         delay(50);
-      }
     }
   return 0;
 }

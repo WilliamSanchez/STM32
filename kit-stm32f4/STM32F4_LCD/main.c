@@ -14,7 +14,6 @@
 #include <math.h>
 
 #include "misc_extras.h"
-#include "configSPI.h"
 #include "configUSART.h"
 #include "lcdOLED.h"
 
@@ -24,11 +23,7 @@ char dataMode[225] = "XXXX";
 
 volatile int numero = 0;
 uint8_t trasmitData[255];
-uint8_t trasmitDataS[255];
-uint8_t dataTime[255];
-uint8_t mode =0;
-uint8_t changeMode[16];
-uint8_t changeDelay[16];
+uint8_t pinread = 0;
 uint8_t contDelay = 20;
 
 
@@ -39,10 +34,9 @@ int main(void){
     serialPC();
     delay_init();
     LCD_Init();
-    configButton();
-    configButton_mode();
-    configButton_delay();
-    
+    configButton_ThM();
+    configButton_ThP();
+    configButton_Rudder();
     delay(1000);display();
     delay(1000);clearDisplay();
     uint8_t contret = 0;
@@ -55,7 +49,7 @@ int main(void){
         delay(50); clearDisplay();
         drawLetter(&contDelay);
         display();  //2
-        sprintf((char*)trasmitData,"CONT %d\r\n", contDelay);
+        sprintf((char*)trasmitData,"CONT %d PIN %d\r\n", contDelay,pinread);
         sendData((char*)trasmitData);
         GPIO_ResetBits(GPIOC,GPIO_Pin_13);
         delay(50);

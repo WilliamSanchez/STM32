@@ -70,8 +70,7 @@
 void LCD_Init();
 
 uint8_t display();
-//void drawLetter(const uint8_t *line1, const uint8_t *line2, const uint8_t *line3, const uint8_t *line4);
-void drawLetter(uint8_t *elevator);
+void drawLetter();
 void drawChar();
 void drawChar1();
 void sendData();
