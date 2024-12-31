@@ -3,7 +3,7 @@
 # -
 
 TARGET=main
-STMDIR=Libraries
+STMDIR=../Libraries
 
 ###################################################
 
