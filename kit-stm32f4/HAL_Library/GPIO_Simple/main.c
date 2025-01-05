@@ -72,6 +72,8 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+      HAL_Delay(100);
   }
 }
 
@@ -189,14 +191,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if(GPIO_Pin == GPIO_PIN_0)
   {
     /* Toggle LED3 */
-    //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); 
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); 
+    //HAL_Delay(500);
     /* Toggle LED4 */
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);    
-    /* Toggle LED5 */
-    //BSP_LED_Toggle(LED5);   
-    /* Toggle LED6 */
-    //BSP_LED_Toggle(LED6);
-  }
+    //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);    
+
+  } 
   
 }
 
