@@ -4,17 +4,16 @@
 
 TARGET=main
 STMDIR=../Libraries
-PATCH_GCC=/home/william/gcc-arm-none-eabi-10.3-2021.10/bin/
 
 ###################################################
 
-CC=$(PATCH_GCC)arm-none-eabi-gcc
-LD=$(PATCH_GCC)arm-none-eabi-gcc
-AR=$(PATCH_GCC)arm-none-eabi-ar
-AS=$(PATCH_GCC)arm-none-eabi-as
-CP=$(PATCH_GCC)arm-none-eabi-objcopy
-OD=$(PATCH_GCC)arm-none-eabi-objdump
-SE=$(PATCH_GCC)arm-none-eabi-size
+CC=arm-none-eabi-gcc
+LD=arm-none-eabi-gcc
+AR=arm-none-eabi-ar
+AS=arm-none-eabi-as
+CP=arm-none-eabi-objcopy
+OD=arm-none-eabi-objdump
+SE=arm-none-eabi-size
 SF=st-flash
 
 ###################################################
@@ -47,14 +46,18 @@ LDFLAGS += -Wl,--gc-sections -Wl,-Map=$(TARGET).map
 SRCS =  main.c stm32f4xx_it.c \
         system_stm32f4xx.c \
        	stm32f4xx_hal_cortex.c \
+		stm32f4xx_hal_msp.c \
         startup_stm32f411xe.s 
  
 
 SRCS += stm32f4xx_hal_rcc.c \
-	stm32f4xx_hal_rcc_ex.c \
-	stm32f4xx_hal_gpio.c \
-        stm32f4xx_hal_exti.c \
-	stm32f4xx_hal.c
+		stm32f4xx_hal_rcc_ex.c \
+		stm32f4xx_hal_gpio.c \
+    	stm32f4xx_hal_exti.c \
+		stm32f4xx_hal_uart.c \
+		stm32f4xx_hal_dma.c \
+		stm32f4xx_hal_spi.c \
+		stm32f4xx_hal.c
 
 
 ###################################################

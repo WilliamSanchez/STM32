@@ -4,26 +4,24 @@
 
 TARGET=main
 STMDIR=../Libraries
-PATCH_GCC=/home/william/gcc-arm-none-eabi-10.3-2021.10/bin/
 
 ###################################################
 
-CC=$(PATCH_GCC)arm-none-eabi-gcc
-LD=$(PATCH_GCC)arm-none-eabi-gcc
-AR=$(PATCH_GCC)arm-none-eabi-ar
-AS=$(PATCH_GCC)arm-none-eabi-as
-CP=$(PATCH_GCC)arm-none-eabi-objcopy
-OD=$(PATCH_GCC)arm-none-eabi-objdump
-SE=$(PATCH_GCC)arm-none-eabi-size
+CC=arm-none-eabi-gcc
+LD=arm-none-eabi-gcc
+AR=arm-none-eabi-ar
+AS=arm-none-eabi-as
+CP=arm-none-eabi-objcopy
+OD=arm-none-eabi-objdump
+SE=arm-none-eabi-size
 SF=st-flash
 
 ###################################################
 
-STMSRCDIR = $(STMDIR)/STM32F4xx_HAL_Driver/Src
+STMSRCDIR = $(STMDIR)/STM32F4xx_StdPeriph_Driver/src
 vpath %.c $(STMSRCDIR)
 
-INC_DIRS = $(STMDIR)/STM32F4xx_HAL_Driver/Inc
-INC_DIRS += $(STMDIR)/CMSIS/Core/Include
+INC_DIRS = $(STMDIR)/STM32F4xx_StdPeriph_Driver/inc
 INC_DIRS += $(STMDIR)/CMSIS/Device/ST/STM32F4xx/Include
 INC_DIRS += $(STMDIR)/CMSIS/Include
 INC_DIRS += .
@@ -32,11 +30,11 @@ INCLUDE = $(addprefix -I,$(INC_DIRS))
 
 ###################################################
 
-CFLAGS  = -std=gnu99 -g -O2 -Wall -TSTM32F411VETx_FLASH.ld
+CFLAGS  = -std=gnu99 -g -O2 -Wall -TSTM32F411CE_FLASH.ld
 CFLAGS += -mlittle-endian -mthumb -mthumb-interwork -mcpu=cortex-m4
 CFLAGS += -fsingle-precision-constant -Wdouble-promotion
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-CFLAGS += -DUSE_HAL_DRIVER -DSTM32F411xE
+CFLAGS += -DUSE_STDPERIPH_DRIVER -DSTM32F411xE
 CFLAGS += -specs=nosys.specs
 
 LDFLAGS += -Wl,--gc-sections -Wl,-Map=$(TARGET).map
@@ -45,16 +43,26 @@ LDFLAGS += -Wl,--gc-sections -Wl,-Map=$(TARGET).map
 
 
 SRCS =  main.c stm32f4xx_it.c \
+        syscalls.c \
+        configSPI.c \
+	misc_extras.c \
+	configUSART.c \
+        configI2C.c \
+	lcdOLED.c \
         system_stm32f4xx.c \
-       	stm32f4xx_hal_cortex.c \
         startup_stm32f411xe.s 
  
 
-SRCS += stm32f4xx_hal_rcc.c \
-	stm32f4xx_hal_rcc_ex.c \
-	stm32f4xx_hal_gpio.c \
-        stm32f4xx_hal_exti.c \
-	stm32f4xx_hal.c
+SRCS += stm32f4xx_rcc.c \
+	stm32f4xx_gpio.c \
+	stm32f4xx_usart.c \
+	stm32f4xx_spi.c \
+	stm32f4xx_i2c.c \
+        stm32f4xx_exti.c \
+	stm32f4xx_pwr.c \
+	stm32f4xx_rtc.c \
+	misc.c \
+	stm32f4xx_syscfg.c
 
 
 ###################################################
