@@ -56,6 +56,7 @@ SRCS += stm32f4xx_hal_rcc.c \
     	stm32f4xx_hal_exti.c \
 		stm32f4xx_hal_uart.c \
 		stm32f4xx_hal_dma.c \
+		stm32f4xx_hal_spi.c \
 		stm32f4xx_hal.c
 
 

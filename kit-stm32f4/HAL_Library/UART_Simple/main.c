@@ -21,46 +21,86 @@
 #include "stm32f4xx_hal.h"
 
 #include <string.h>
+#include <stdio.h>
+
+#define USART                         USART1
+/*
+#define USART_CLK_ENABLE()            __HAL_RCC_USART1_CLK_ENABLE()
+#define USART_RX_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USART_TX_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+
+#define USART_FORCE_RESET()           __HAL_RCC_USART1_FORCE_RESET()
+#define USART_RELEASE_RESET()         __HAL_RCC_USART1_RELEASE_RESET()
+
+#define USART_TX_PIN                    GPIO_PIN_9
+#define USART_TX_GPIO_PORT              GPIOA  
+#define USART_TX_AF                     GPIO_AF7_USART1
+#define USART_RX_PIN                    GPIO_PIN_10
+#define USART_RX_GPIO_PORT              GPIOA 
+#define USART_RX_AF                     GPIO_AF7_USART1
+*/
 
 static void SystemClock_Config(void);
-static void EXTILine0_Config(void);
+//static void EXTILine0_Config(void);
 static void BSP_LED_Init();
 static void USART_config(void);
 
 UART_HandleTypeDef UartHandle;
 __IO ITStatus UartReady = RESET;
 
-uint8_t aTxBuffer[] = " ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT****  ****UART_TwoBoards_ComIT**** ";
+uint8_t aTxBuffer[16] = "HOLA\n\r";
+
+
+/*
+
+  PA0   => Switch key0
+  PC13  => Led  
+
+*/
 
 int main(void)
 {
 
   HAL_Init();
 
+    /* Configure the system clock to 100 MHz */
+  SystemClock_Config();
+
   USART_config();
  
   /* Configure LED3, LED4, LED5 and LED6 */
   BSP_LED_Init();
-  
-  /* Configure the system clock to 100 MHz */
-  SystemClock_Config();
     
   /* Configure EXTI Line0 (connected to PA0 pin) in interrupt mode */
-  EXTILine0_Config();
+ // EXTILine0_Config();
 
-  while(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)aTxBuffer, strlen((char* )aTxBuffer)) != HAL_OK)
+  HAL_Delay(1000);
+  uint8_t rest;
+  if ((rest = HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, strlen((char* )aTxBuffer), 5000)) != HAL_OK)
+  {
+    sprintf((char*)aTxBuffer,"RE %x\n\r",rest);
+    HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, 4, 5000);
+  }
   
   /* Infinite loop */
   while (1)
   {
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-      HAL_Delay(100);
+      if ((rest = HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, strlen((char* )aTxBuffer), 5000)) != HAL_OK)
+      {
+        sprintf((char*)aTxBuffer,"RE %x\n\r",rest);
+        HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, 4, 5000);
+      }
+      HAL_Delay(1000);
   }
 }
 
 
 static void USART_config(void)
 {
+
+    UartHandle.Instance           = USART;
+
     UartHandle.Init.BaudRate      = 115200;
     UartHandle.Init.WordLength    = UART_WORDLENGTH_8B;
     UartHandle.Init.StopBits      = UART_STOPBITS_1;
@@ -121,7 +161,7 @@ static void SystemClock_Config(void)
     //Error_Handler();
   }
 }
-
+/*
 static void EXTILine0_Config(void)
 {
   GPIO_InitTypeDef   GPIO_InitStructure;
@@ -134,7 +174,7 @@ static void EXTILine0_Config(void)
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
-
+*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if(GPIO_Pin == GPIO_PIN_0)
