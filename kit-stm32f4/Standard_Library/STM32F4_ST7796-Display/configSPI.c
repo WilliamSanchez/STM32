@@ -35,11 +35,11 @@ void Init_SPI(void){
 
 
    // Configure sEE pins: SCK /
-   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;   // --> SPI2_SCK
+   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;   
    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN; //GPIO_PuPd_UP;
    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
    // Connect PXx to sEE_SCK /
@@ -56,7 +56,7 @@ void Init_SPI(void){
    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+   //GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
    GPIO_Init(GPIOA, &GPIO_InitStructure); 
 
   // SPI configuration -------------------------------------------------------//
@@ -74,14 +74,8 @@ void Init_SPI(void){
 
   SPI_Cmd(SPI1, ENABLE);
 
-   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;  // --> SPI2_CSs 
-   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-   GPIO_Init(GPIOA, &GPIO_InitStructure); 
-
   GPIO_SetBits(GPIOA, GPIO_Pin_4); 
+  
 }
 
 /////////  SPI Read Regster
@@ -107,16 +101,18 @@ uint8_t SPI_readReg(uint8_t reg){
 
 void SPI_writeReg(uint8_t reg, uint8_t regvalue){
 
-   GPIO_ResetBits(GPIOA, GPIO_Pin_4); // ---> nss 
+   //GPIO_ResetBits(GPIOA, GPIO_Pin_4); // ---> nss 
+   GPIO_ResetBits(GPIOB,GPIO_Pin_10); // -->> Write comnad
    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
    SPI_SendData(SPI1, reg);
    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
    SPI_ReceiveData(SPI1);
+   GPIO_SetBits(GPIOB,GPIO_Pin_10);  // -->> Write data/register
    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
    SPI_SendData(SPI1, regvalue);
    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
    SPI_ReceiveData(SPI1);
-   GPIO_SetBits(GPIOA, GPIO_Pin_4);  // ---> nss 
+   //GPIO_SetBits(GPIOA, GPIO_Pin_4);  // ---> nss 
 
 }
 
@@ -133,17 +129,17 @@ void SPI_TxData(uint8_t value){
 
 /////////  SPI Write Burst data
 
-void SPI_writeData(uint8_t reg, uint8_t *Datavalue, uint8_t length){
+void SPI_writeData(uint8_t reg, uint8_t *Datavalue, uint32_t length){
 
 	if (length <= 1){
 	  return;
 	} else{
-		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+      GPIO_ResetBits(GPIOB,GPIO_Pin_10); // -->> Write comnad
 		SPI_TxData(reg);
+      GPIO_SetBits(GPIOB,GPIO_Pin_10);  // -->> Write data/register
 		for (int i=0; i<length; i++){
 		   SPI_TxData(*(Datavalue+i));		
 		}
-		GPIO_SetBits(GPIOB, GPIO_Pin_11); 
 	}
 
 }

@@ -44,8 +44,11 @@ static void SystemClock_Config(void);
 //static void EXTILine0_Config(void);
 static void BSP_LED_Init();
 static void USART_config(void);
+static void SPI_config(void);
 
 UART_HandleTypeDef UartHandle;
+SPI_HandleTypeDef SpiHandle;
+
 __IO ITStatus UartReady = RESET;
 
 uint8_t aTxBuffer[16] = "HOLA\n\r";
@@ -67,12 +70,13 @@ int main(void)
   SystemClock_Config();
 
   USART_config();
+  SPI_config();
  
   /* Configure LED3, LED4, LED5 and LED6 */
   BSP_LED_Init();
     
   /* Configure EXTI Line0 (connected to PA0 pin) in interrupt mode */
- // EXTILine0_Config();
+
 
   HAL_Delay(1000);
   uint8_t rest;
@@ -83,8 +87,18 @@ int main(void)
   }
   
   /* Infinite loop */
+  uint8_t data[4];
+  uint8_t command = 0x04;
   while (1)
   {
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+      HAL_SPI_Transmit(&SpiHandle, &command, 1, 5000); 
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+      HAL_SPI_Receive(&SpiHandle, data, 4, 5000);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+      HAL_Delay(1000);
+      sprintf((char*)aTxBuffer,"DATA %x|%x|%x|%x\n\r",data[0],data[1],data[2],data[3]);
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
       if ((rest = HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, strlen((char* )aTxBuffer), 5000)) != HAL_OK)
       {
@@ -113,24 +127,55 @@ static void USART_config(void)
 
 }
 
+
+static void SPI_config(void)
+{
+
+    SpiHandle.Instance           = SPI1;
+
+    SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+    SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
+    SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
+    SpiHandle.Init.CLKPolarity       = SPI_POLARITY_HIGH;
+    SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
+    SpiHandle.Init.CRCPolynomial     = 7;
+    SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
+    SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
+    SpiHandle.Init.NSS               = SPI_NSS_HARD_OUTPUT;//SPI_NSS_SOFT;
+    SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
+
+    SpiHandle.Init.Mode              = SPI_MODE_MASTER;
+
+    while(HAL_SPI_Init(&SpiHandle) != HAL_OK);
+
+}
+
+
 static void BSP_LED_Init()
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
   
   /* Enable the GPIO_LED Clock */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /* Configure the GPIO_LED pin */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = GPIO_PIN_10;  
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = GPIO_PIN_4;  
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET); 
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET); 
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET); 
 }
-
 
 static void SystemClock_Config(void)
 {
@@ -161,34 +206,3 @@ static void SystemClock_Config(void)
     //Error_Handler();
   }
 }
-/*
-static void EXTILine0_Config(void)
-{
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStructure.Pull = GPIO_NOPULL;
-  GPIO_InitStructure.Pin = GPIO_PIN_0;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-}
-
-*/
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if(GPIO_Pin == GPIO_PIN_0)
-  {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); 
-  
-
-  } 
-  
-}
-
-
-
-
-/**
-  * @}
-  */
