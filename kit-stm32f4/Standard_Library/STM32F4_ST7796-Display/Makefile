@@ -48,7 +48,6 @@ SRCS =  main.c stm32f4xx_it.c \
 	misc_extras.c \
 	configUSART.c \
         configI2C.c \
-	lcdOLED.c \
         system_stm32f4xx.c \
         startup_stm32f411xe.s 
  

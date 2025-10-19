@@ -141,7 +141,22 @@ void SPI_writeData(uint8_t reg, uint8_t *Datavalue, uint32_t length){
 		   SPI_TxData(*(Datavalue+i));		
 		}
 	}
-
 }
 
+void SPI_writePixel(uint8_t *Datavalue, uint32_t length){
 
+	if (length <= 1){
+	  return;
+	} else{
+      GPIO_SetBits(GPIOB,GPIO_Pin_0); 
+      GPIO_ResetBits(GPIOB,GPIO_Pin_10); // -->> Write comnad
+		SPI_TxData(0x2C);
+      GPIO_SetBits(GPIOB,GPIO_Pin_10);  // -->> Write data/register
+		for (int i=0; i<length; i++){
+            while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+   		   SPI_SendData(SPI1, *(Datavalue+i));		
+            while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+		}
+      GPIO_ResetBits(GPIOB,GPIO_Pin_0);
+	}
+}
