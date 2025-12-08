@@ -90,6 +90,6 @@
 int8_t bmp180_init(void);
 long BMP180_temperature();
 long BMP180_Preassure();
-long altitude();
+long altitude(const long pres);
 
 #endif

@@ -48,6 +48,7 @@ SRCS =  main.c stm32f4xx_it.c \
        	stm32f4xx_hal_cortex.c \
 		stm32f4xx_hal_msp.c \
 		bmp180_bar.c \
+		mpu6050_gyro_accel.c \
 		config_usart.c \
 		config_i2c.c \
         startup_stm32f411xe.s 

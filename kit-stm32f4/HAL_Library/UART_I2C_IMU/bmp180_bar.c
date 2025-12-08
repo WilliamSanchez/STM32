@@ -11,7 +11,7 @@ short B1, B2;
 short MB, MC, MD;
 long B5 = 0;
 
-char debug_i2c[255];
+static char debug_i2c[255];
 
 int8_t bmp180_init(void)
 {
@@ -40,7 +40,7 @@ int8_t bmp180_init(void)
     MC = dec16(calibration_coefficient[18], calibration_coefficient[19]); 
     MD = dec16(calibration_coefficient[20], calibration_coefficient[21]);
 
-    sprintf(debug_i2c,"AC : %d|%d|%d|%d|%d|%d\n\rB : %d|%d\n\rMB : %d\n\rMC : %d\n\rMD %d\n\r", AC1, AC2, AC3, AC4, AC5, AC6, B1, B2, MB, MC, MD);
+    sprintf(debug_i2c,"AC: %d|%d|%d|%d|%d|%d\n\rB: %d|%d\n\rMB: %d\n\rMC: %d\n\rMD: %d\n\r", AC1, AC2, AC3, AC4, AC5, AC6, B1, B2, MB, MC, MD);
     usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
 
     return 0;
@@ -70,16 +70,13 @@ long BMP180_temperature()
     }
 
     BMP180_T = dec16(UT[0],UT[1]);
-    sprintf(debug_i2c,"UT : %x%x|%ld\n\r", UT[0], UT[1], BMP180_T);
-    usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
 
     x1 = ((BMP180_T - AC6)*AC5)>>15; ///pow(2,15);
     x2 = (MC<<11)/(x1+MD);
     B5 = x1 + x2;
 
     Temp = (B5+8)>>4;
-
-    sprintf(debug_i2c,"Temperature : %ld x1 : %ld, x2: %ld, B5 : %ld\n\r", Temp,x1,x2,B5);
+    sprintf(debug_i2c,"Temperature : %02f c\n\r", (float)Temp/10);
     usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
 
     return Temp;
@@ -112,8 +109,6 @@ long BMP180_Preassure()
     }
 
     BMP180_P = (dec24(UP[0],UP[1],UP[2]) >> (8-oss));
-    sprintf(debug_i2c,"UP : %x%x%x|%ld\n\r", UP[0], UP[1], UP[2], BMP180_P);
-    usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
 
     B6 = B5 - 4000;
     xp1 = ((B2*B6*(B6>>12))>>11);
@@ -135,16 +130,16 @@ long BMP180_Preassure()
     xp2 = (-7357*Pres)>>16;
     Pres += ((xp1+xp2+3791)>>2);
 
-    sprintf(debug_i2c,"preassure: %ld x1 : %ld, x2: %ld\n\r", Pres,xp1,xp2);
+    sprintf(debug_i2c,"preassure: %ld Pa\n\r", Pres);
     usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
 
     return Pres;
 }
 
-long altitude()
+long altitude(const long pres)
 {
     long alt = 0;
-    float P = (float)(BMP180_Preassure()/100);
+    float P = (float)(pres/100);
     alt = 44330*(1 - pow((P/Po),alt_coefficient));
     sprintf(debug_i2c,"Altitude: %ld m\n\r", alt);
     usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));

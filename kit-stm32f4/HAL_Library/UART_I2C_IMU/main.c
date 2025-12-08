@@ -5,6 +5,7 @@
 
 
 #include "bmp180_bar.h"
+#include "mpu6050_gyro_accel.h"
 #include "config_usart.h"
 #include "config_i2c.h"
 
@@ -57,8 +58,22 @@ int main(void)
       strcpy(debug,"Error init barometer\n\t");
       usart_send((uint8_t*)debug,strlen(debug));
   }
+  
+  strcpy(debug,"\tAccelerometer and gyrometer mpu6050 initializing\n\r");
+  usart_send((uint8_t*)debug,strlen(debug));
+  if (mpu6050_init() < 0)
+  {
+      memset(debug,0x00,255);
+      strcpy(debug,"Error init accel and gyro\n\t");
+      usart_send((uint8_t*)debug,strlen(debug));
+  }
 
-
+  if (mpu6050_gyro_calibrate() < 0)
+  {
+      memset(debug,0x00,255);
+      strcpy(debug,"Error calibrate gyro\n\t");
+      usart_send((uint8_t*)debug,strlen(debug));
+  }
 
 /*
   char addr = (0x68<<1);
@@ -76,6 +91,7 @@ int main(void)
   usart_send(aTxBuffer, strlen((char*)aTxBuffer));
 */
  
+  long p_calc = 0;
   while (1)
   {
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
@@ -84,9 +100,10 @@ int main(void)
       because the preassure depend of the temperaure.
       */
       BMP180_temperature();
-      BMP180_Preassure();
-      altitude();
-      HAL_Delay(2500);
+      p_calc = BMP180_Preassure();
+      altitude(p_calc);
+      MPU6050_data();
+      HAL_Delay(1000);
   }
 }
 
