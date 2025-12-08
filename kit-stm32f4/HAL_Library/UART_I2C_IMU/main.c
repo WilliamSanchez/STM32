@@ -49,7 +49,7 @@ int main(void)
   
 
   HAL_Delay(1000);
-  strcpy(debug,"Barometer BMP180 initializing\n\t");
+  strcpy(debug,"\tBarometer BMP180 initializing\n\r");
   usart_send((uint8_t*)debug,strlen(debug));
   if (bmp180_init() < 0)
   {
@@ -80,13 +80,13 @@ int main(void)
   {
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
       /*
-      if ((rest = HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, strlen((char* )aTxBuffer), 5000)) != HAL_OK)
-      {
-        sprintf((char*)aTxBuffer,"RE %x\n\r",rest);
-        HAL_UART_Transmit(&UartHandle, (uint8_t*)aTxBuffer, 4, 5000);
-      }
+      To calculate pession, is necessary first calculate teperature 
+      because the preassure depend of the temperaure.
       */
-      HAL_Delay(1000);
+      BMP180_temperature();
+      BMP180_Preassure();
+      altitude();
+      HAL_Delay(2500);
   }
 }
 

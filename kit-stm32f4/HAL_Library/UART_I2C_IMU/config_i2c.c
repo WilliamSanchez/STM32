@@ -18,7 +18,7 @@ void I2C_config(void)
 
 }
 
-int8_t i2c_send(uint8_t address, uint8_t reg, uint8_t *buffer, int len){
+int8_t i2c_send(uint8_t address, uint8_t *buffer, int len){
     /* Timeout is set to 10S */ 
     if(HAL_I2C_Master_Transmit(&I2CHandle, address, buffer, len, 10000)!= HAL_OK)
         return -1;
