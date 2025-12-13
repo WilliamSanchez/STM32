@@ -21,7 +21,7 @@
 
 const uint16_t HORIZONTAL =       320;
 const uint16_t VERTICAL   =       125;//480;//
-const uint32_t numPixelbits = 2*HORIZONTAL*VERTICAL;
+const uint32_t numPixelbits =   HORIZONTAL*VERTICAL;
 
 #define COL_ADDR_SET      0x2A
 #define ROW_ADDR_SET      0X2B
@@ -32,7 +32,6 @@ const uint16_t Vertical_line = 480;//480;
 
 char bufferTX[512];
 char buffer[255];
-
 volatile int numero = 0;
 uint8_t trasmitData[255];
 uint8_t trasmitDataS[255];
@@ -62,13 +61,13 @@ int main(void){
     uint8_t reg[] = {0x80, 0x02, 0x3B};
     uint8_t col[] = {0x00, 0x00, XMLBs, XLSBs};
     uint8_t row[] = {0x00, 0x00, YMLBs, YLSBs};
-    uint8_t size_display[numPixelbits];
-    memset(size_display,0xF0,numPixelbits);
+    uint16_t size_display[numPixelbits];
+    memset(size_display,0xF0CD,numPixelbits);
 
     GPIO_ResetBits(GPIOA, GPIO_Pin_4); // ---> nss 
 
     GPIO_ResetBits(GPIOB,GPIO_Pin_10); // -->> Write comnad
-		SPI_TxData(0x01);
+    SPI_TxData(0x01);
     delay(150);
     /*
       F0h Comand Set Control pag 239
@@ -157,11 +156,10 @@ int main(void){
       29h Display ON pag 169
       This command is used to recover from display off mode 28h
     */
-		SPI_TxData(0x29); 
+    SPI_TxData(0x29); 
     delay(150);
     GPIO_SetBits(GPIOA, GPIO_Pin_4); // ---> nss 
-    uint8_t cont = 0;
-
+    uint16_t cont = 0;
     while(1)
     {
       GPIO_SetBits(GPIOC,GPIO_Pin_13);
@@ -177,7 +175,7 @@ int main(void){
       SPI_writePixel(size_display, 50*320);
       GPIO_SetBits(GPIOA, GPIO_Pin_4); // ---> nss 
       GPIO_ResetBits(GPIOC,GPIO_Pin_13);
-      delay(500);
+      //delay(500);
 
       GPIO_SetBits(GPIOC,GPIO_Pin_13);
       

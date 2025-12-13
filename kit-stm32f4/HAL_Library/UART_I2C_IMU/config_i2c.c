@@ -31,7 +31,6 @@ int8_t i2c_received(uint8_t address, uint8_t *reg, uint8_t *buffer, int len)
       /* Timeout is set to 10S */ 
      if(HAL_I2C_Master_Transmit(&I2CHandle, address, reg, 1, 10000) != HAL_OK)
         return -1;
-   
     if(HAL_I2C_Master_Receive(&I2CHandle, address, buffer, len, 10000) != HAL_OK)
         return -1;
     return 0;

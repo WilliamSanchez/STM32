@@ -143,7 +143,7 @@ void SPI_writeData(uint8_t reg, uint8_t *Datavalue, uint32_t length){
 	}
 }
 
-void SPI_writePixel(uint8_t *Datavalue, uint32_t length){
+void SPI_writePixel(uint16_t *Datavalue, uint32_t length){
 
 	if (length <= 1){
 	  return;

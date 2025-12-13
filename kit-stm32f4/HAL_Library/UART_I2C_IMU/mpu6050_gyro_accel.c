@@ -28,7 +28,7 @@ int8_t mpu6050_init(void)
         return -1;
     }
 
-     data[0] = 0x1C; data[1] = 0x00;
+    data[0] = 0x1C; data[1] = 0x00;
     if(i2c_send(MPU6050_Addr, (uint8_t*)data, 2))
     {
         strcpy(debug_i2c,"Error config Temperature\n\r");
@@ -36,7 +36,24 @@ int8_t mpu6050_init(void)
         return -1;
     }
 
-    data[0] = 0x6B; data[1] = 0x01;
+    data[0] = 0x37; data[1] = 0x02;
+    if(i2c_send(MPU6050_Addr, (uint8_t*)data, 2))
+    {
+        strcpy(debug_i2c,"Error config Temperature\n\r");
+        usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
+        return -1;
+    }
+
+    data[0] = 0x6A; data[1] = 0x00;
+    if(i2c_send(MPU6050_Addr, (uint8_t*)data, 2))
+    {
+        strcpy(debug_i2c,"Error config Temperature\n\r");
+        usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
+        return -1;
+    }
+
+    /*  Register for disable sleep mode, necessary to compass 0x00*/
+    data[0] = 0x6B; data[1] = 0x00; //data[1] = 0x01;
     if(i2c_send(MPU6050_Addr, (uint8_t*)data, 2))
     {
         strcpy(debug_i2c,"Error config Temperature\n\r");
@@ -77,7 +94,6 @@ int8_t mpu6050_gyro_calibrate()
     usart_send((uint8_t*)debug_i2c,strlen(debug_i2c));
     return 0;
 }
-
 
 int MPU6050_data()
 {
