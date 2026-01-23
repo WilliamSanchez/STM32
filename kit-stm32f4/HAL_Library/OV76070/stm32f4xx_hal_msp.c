@@ -129,4 +129,16 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 
 }
 
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+{
+    /*##-1- Enable peripherals and GPIO Clocks #################################*/
+  /* TIMx Peripheral clock enable */
+  __HAL_RCC_TIM3_CLK_ENABLE();
+    /*##-2- Configure the NVIC for TIMx ########################################*/
+  /* Set Interrupt Group Priority */ 
+  //HAL_NVIC_SetPriority(TIM3_IRQn, 4, 0);
 
+    /* Enable the TIMx global Interrupt */
+  //HAL_NVIC_EnableIRQ(TIM3_IRQn);
+
+}

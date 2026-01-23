@@ -4,14 +4,10 @@
 #include <stdio.h>
 
 
-#include "bmp180_bar.h"
-#include "mpu6050_gyro_accel.h"
-#include "HMC5883L_compass.h"
+#include "OV7670.h"
 #include "config_usart.h"
 #include "config_i2c.h"
-
-#define HMC5883L_Addr   (0x1E<<1)
-
+#include "config_xclk.h"
 
 /*
         GY-87 10DOF
@@ -23,15 +19,13 @@
   PB6 ======> SCL
   PB7 ======> SDA
 
-  PA9  ======> Tx
-  PA10  =====> Rx
+  PA9  ======> UART-Tx
+  PA10  =====> UART-Rx
 
   PA0   => Switch key0
   PC13  => Led  
 
-  BMP180    Addr = 0xEF (11101111: Read), 0xEE(11101110 : Write)
-  HMC5883L  Addr = 0x3D (00111101 : Read), 0x3C (00111100 : Write)
-  MPU6050   Addr = 0x68 
+  OV7670    Addr = 0x43 (01000011: Read), 0x42(01000010 : Write)
 
 */
 
@@ -50,70 +44,53 @@ int main(void)
  
   /* Configure GPIOC LED13 */
   BSP_LED_Init();  
-  
-  strcpy(debug,"\tBarometer BMP180 initializing\n\r");
+
+  strcpy(debug,"\tINIT OV7670 CAMERA PROGRAM\n\r");
   usart_send((uint8_t*)debug,strlen(debug));
-  if (bmp180_init() < 0)
+
+  if (begin_xclk() < 0)
   {
       memset(debug,0x00,255);
-      strcpy(debug,"Error init barometer\n\t");
+      strcpy(debug,"Error initializing xclk\n\t");
       usart_send((uint8_t*)debug,strlen(debug));
   }
-  
-  strcpy(debug,"\tAccelerometer and gyrometer mpu6050 initializing\n\r");
+
+  /*
+  strcpy(debug,"\tCamera OV7670 initializing\n\r");
   usart_send((uint8_t*)debug,strlen(debug));
-  if (mpu6050_init() < 0)
+  if (ov7670_init() < 0)
   {
       memset(debug,0x00,255);
-      strcpy(debug,"Error init accel and gyro\n\t");
+      strcpy(debug,"Error init camera\n\t");
       usart_send((uint8_t*)debug,strlen(debug));
   }
-
-  if (mpu6050_gyro_calibrate() < 0)
-  {
-      memset(debug,0x00,255);
-      strcpy(debug,"Error calibrate gyro\n\t");
-      usart_send((uint8_t*)debug,strlen(debug));
-  }
-
-
-  sprintf(debug,"Compass HMC5883L initializing\n\r");
-  usart_send(debug, strlen(debug));
-  if (HMC5883L_init() < 0)
-  {
-      memset(debug,0x00,255);
-      strcpy(debug,"Error init compass\n\t");
-      usart_send((uint8_t*)debug,strlen(debug));
-  }
-  long p_calc = 0;
-
+  */
   HAL_Delay(1000);
+  uint8_t _COM7=0x06;
+  uint8_t RxCOM7=0x00;
 
   while (1)
   {
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
       /*
-      To calculate pession, is necessary first calculate teperature 
-      because the preassure depend of the temperaure.
+      if (i2c_received(0x43,&_COM7, &RxCOM7, 1) < 0)
+      {
+        strcpy(debug,"Error read register\n\r");
+        usart_send((uint8_t*)debug,strlen(debug));
+        return -1;
+      }
+
+      sprintf(debug,"Register COM7 is %x\n\r",RxCOM7);
+      usart_send((uint8_t*)debug,strlen(debug));
       */
-      BMP180_temperature();
-      p_calc = BMP180_Preassure();
-      altitude(p_calc);
-      MPU6050_data();
-      HMC5883L_data();
       HAL_Delay(1000);
   }
 }
 
 /*
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if(GPIO_Pin == GPIO_PIN_0)
-  {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); 
-  
-
-  } 
-  
+  //BSP_LED_Toggle(LED4);
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_8);
 }
 */

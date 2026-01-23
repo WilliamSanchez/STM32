@@ -47,11 +47,10 @@ SRCS =  main.c stm32f4xx_it.c \
         system_stm32f4xx.c \
        	stm32f4xx_hal_cortex.c \
 		stm32f4xx_hal_msp.c \
-		bmp180_bar.c \
-		mpu6050_gyro_accel.c \
-		HMC5883L_compass.c \
+		OV7670.c \
 		config_usart.c \
 		config_i2c.c \
+		config_xclk.c \
         startup_stm32f411xe.s 
  
 
@@ -63,6 +62,8 @@ SRCS += stm32f4xx_hal_rcc.c \
 		stm32f4xx_hal_dma.c \
 		stm32f4xx_hal_spi.c \
 		stm32f4xx_hal_i2c.c \
+		stm32f4xx_hal_tim.c \
+		stm32f4xx_hal_tim_ex.c \
 		stm32f4xx_hal.c
 
 

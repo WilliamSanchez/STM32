@@ -10,7 +10,7 @@ void I2C_config(void)
     I2CHandle.Instance              = I2C;
 
     I2CHandle.Init.AddressingMode   = I2C_ADDRESSINGMODE_7BIT;
-    I2CHandle.Init.ClockSpeed       = 400000;
+    I2CHandle.Init.ClockSpeed       = 100000;
     I2CHandle.Init.GeneralCallMode  = I2C_GENERALCALL_DISABLE;
     I2CHandle.Init.NoStretchMode    = I2C_NOSTRETCH_DISABLE;
 
