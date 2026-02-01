@@ -7,29 +7,34 @@
 #include "OV7670.h"
 #include "config_usart.h"
 #include "config_i2c.h"
+#include "config_spi.h"
 #include "config_xclk.h"
+#include "ST7796.h"
+
+SPI_HandleTypeDef SPIHandle;
 
 /*
-        GY-87 10DOF
 
-  MPU6050:  A 6-axis gyroscope
-  HMC5883L: A 3-axis digital magnetometer or compass
-  BMP180:   barometer.
-
-  PB6 ======> SCL
-  PB7 ======> SDA
-
-  PA9  ======> UART-Tx
-  PA10  =====> UART-Rx
-
-  PA0   => Switch key0
-  PC13  => Led  
-
-  OV7670    Addr = 0x43 (01000011: Read), 0x42(01000010 : Write)
+  PB6   =>  SCL
+  PB7   =>  SDA
+  PA9   =>  UART-Tx
+  PA10  =>  UART-Rx
+  PA0   =>  Switch key0
+  PC13  =>  Led 
+  PB10  =>  Command
+  PA4   =>  NSS
+  PA5   =>  SCK1
+  PA6   =>  MISO  Optional
+  PA7   =>  MOSI
 
 */
 
+//  OV7670    Addr = 0x43 (01000011: Read), 0x42(01000010 : Write)
+
+
+
 char debug[255];
+uint8_t bit1;
 
 int main(void)
 {
@@ -40,7 +45,8 @@ int main(void)
   SystemClock_Config();
 
   USART_config();
-  I2C_config();
+  //I2C_config();
+  SPI_config();
  
   /* Configure GPIOC LED13 */
   BSP_LED_Init();  
@@ -48,42 +54,61 @@ int main(void)
   strcpy(debug,"\tINIT OV7670 CAMERA PROGRAM\n\r");
   usart_send((uint8_t*)debug,strlen(debug));
 
-  if (begin_xclk() < 0)
-  {
-      memset(debug,0x00,255);
-      strcpy(debug,"Error initializing xclk\n\t");
-      usart_send((uint8_t*)debug,strlen(debug));
-  }
+  //if (begin_xclk() < 0)
+  //{
+  //    memset(debug,0x00,255);
+  //    strcpy(debug,"Error initializing xclk\n\t");
+  //    usart_send((uint8_t*)debug,strlen(debug));
+  //}
 
-  /*
   strcpy(debug,"\tCamera OV7670 initializing\n\r");
   usart_send((uint8_t*)debug,strlen(debug));
-  if (ov7670_init() < 0)
-  {
-      memset(debug,0x00,255);
-      strcpy(debug,"Error init camera\n\t");
-      usart_send((uint8_t*)debug,strlen(debug));
-  }
-  */
+  //if (ov7670_init() < 0)
+  //{
+  //    memset(debug,0x00,255);
+  //    strcpy(debug,"Error init camera\n\t");
+  //    usart_send((uint8_t*)debug,strlen(debug));
+  //}
+  
+  //config_pixels();
+  //config_vsyn(); 
+
+  st7796_init();
+
   HAL_Delay(1000);
-  uint8_t _COM7=0x06;
-  uint8_t RxCOM7=0x00;
+
+    uint8_t size_display[2*320];
+    //memset(size_display,0xF0CD,2*50*50);
+    uint8_t cont = 0;
 
   while (1)
   {
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-      /*
-      if (i2c_received(0x43,&_COM7, &RxCOM7, 1) < 0)
-      {
-        strcpy(debug,"Error read register\n\r");
-        usart_send((uint8_t*)debug,strlen(debug));
-        return -1;
-      }
+  
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);   
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); // ---> nss
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET); // -->> Write comnad
+		  SPI_TxData(0x2C);
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);  // -->> Write data/register
+		  for (int i=0; i<480; i++){
+          memset(size_display,cont,2*320);
+          //for (int j=0; j<320; i++){
+            HAL_SPI_Transmit(&SPIHandle, size_display, 2*320, 0);
+          //}
+		  }
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // ---> nss   
+      HAL_Delay(500);
+      cont +=1;
+  
+    }
+}
 
-      sprintf(debug,"Register COM7 is %x\n\r",RxCOM7);
-      usart_send((uint8_t*)debug,strlen(debug));
-      */
-      HAL_Delay(1000);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == GPIO_PIN_0)
+  {
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+    bit1  = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7); //0000000 0|1
+    //dec16(msb,lsb)
   }
 }
 

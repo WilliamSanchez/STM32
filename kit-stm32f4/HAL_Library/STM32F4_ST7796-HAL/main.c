@@ -57,7 +57,14 @@ uint8_t aTxBuffer[16] = "HOLA\n\r";
 /*
 
   PA0   => Switch key0
-  PC13  => Led  
+  PC13  => Led
+  PB10  =>
+  PA4   =>
+  PA5   =>
+  PA6   =>
+  PA7   =>
+  PA9   =>
+  PA10  =>
 
 */
 

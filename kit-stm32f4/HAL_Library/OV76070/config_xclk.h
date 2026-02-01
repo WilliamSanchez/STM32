@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define TIM                         TIM3
+#define TIM TIM3
 
 int8_t begin_xclk();
 

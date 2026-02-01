@@ -49,8 +49,10 @@ SRCS =  main.c stm32f4xx_it.c \
 		stm32f4xx_hal_msp.c \
 		OV7670.c \
 		config_usart.c \
+		config_spi.c \
 		config_i2c.c \
 		config_xclk.c \
+		ST7796.c \
         startup_stm32f411xe.s 
  
 

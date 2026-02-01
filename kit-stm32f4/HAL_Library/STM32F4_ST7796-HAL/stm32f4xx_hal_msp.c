@@ -35,7 +35,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
   GPIO_InitStruct.Pin = GPIO_PIN_10;  /
   HAL_GPIO_Init(GPIOA/*USARTx_RX_GPIO_PORT*/, &GPIO_InitStruct);
-
+}
 void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {  
   GPIO_InitTypeDef  GPIO_InitStruct;
