@@ -43,6 +43,11 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void TIM3_IRQHandler(void);
 void EXTI0_IRQHandler(void);
+//void EXTI1_IRQHandler(void);
+//void EXTI2_IRQHandler(void);
+//void DMA1_Stream5_IRQHandler(void);
+//void SPI1_IRQHandler(void);
+
 #ifdef __cplusplus
 }
 #endif

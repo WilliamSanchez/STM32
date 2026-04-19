@@ -60,7 +60,7 @@ int8_t st7796_init()
       RGB:      Color selector switch "0" RGB, "1" BGR.
       MH:       Horizontal refresh order '0' Left to Right, '1' Right to Left
     */
-    SPI_writeReg(0x36, 0x28); //0x48 Verical
+    SPI_writeReg(0x36, 0x48);
     /*
       3Ah Interface pixel format pag 190
       

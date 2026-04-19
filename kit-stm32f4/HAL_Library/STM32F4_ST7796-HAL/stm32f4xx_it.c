@@ -45,6 +45,9 @@
   * @param  None
   * @retval None
   */
+
+extern TIM_HandleTypeDef    TimHandle;
+
 void NMI_Handler(void)
 {
 }
@@ -150,6 +153,11 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
+void TIM3_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&TimHandle);
+}
+
 void EXTI0_IRQHandler(void)
 {
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);

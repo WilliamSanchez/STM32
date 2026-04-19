@@ -45,10 +45,6 @@
   * @param  None
   * @retval None
   */
-
-extern TIM_HandleTypeDef    TimHandle;
-extern SPI_HandleTypeDef    SPIHandle;
-
 void NMI_Handler(void)
 {
 }
@@ -154,38 +150,10 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void TIM3_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&TimHandle);
-}
-
 void EXTI0_IRQHandler(void)
 {
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); 
-      HAL_Delay(1000);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
-
-void EXTI1_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
-}
-
-void EXT2_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-}
-
-void DMA1_Stream4_IRQHandler()
-{
-  HAL_DMA_IRQHandler(SPIHandle.hdmatx); 
-}
-
-void SPI1_IRQHandler()
-{
-  HAL_SPI_IRQHandler(&SPIHandle);
-}
-
 
 /**
   * @brief  This function handles PPP interrupt request.

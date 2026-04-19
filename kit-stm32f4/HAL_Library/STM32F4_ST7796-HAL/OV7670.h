@@ -11,9 +11,8 @@
 #define dec16(msb,lsb)( ( msb << 8 ) | lsb)
 #define dec24(msb,lsb, xsb)( ( msb << 16 ) | ( lsb << 8 ) | xsb)
 
-int8_t config_pclk(void);
+int8_t config_vsyn(void);
 int8_t config_pixels(void);
-int8_t config_href(void);
 int8_t ov7670_init(void);
 
 

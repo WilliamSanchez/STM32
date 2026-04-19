@@ -129,49 +129,4 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 
 }
 
-void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
-{
-  //PB6 ======> SCL
-  //PB7 ======> SDA
-  GPIO_InitTypeDef GPIO_InitStruct;
 
-  __HAL_RCC_SPI1_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-/*
-  PA4   =>  NSS
-  
-  PA6   =>  MISO  Optional
-  
-*/
-
-  /*  SCK PA5   =>  SCK1 */
-  GPIO_InitStruct.Pin       = GPIO_PIN_5; 
-  GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull      = GPIO_PULLUP;
-  GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-
-  /*  PA7   =>  MOSI  */
-  GPIO_InitStruct.Pin       = GPIO_PIN_7;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-}
-
-void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
-{
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-  /* TIMx Peripheral clock enable */
-  __HAL_RCC_TIM3_CLK_ENABLE();
-    /*##-2- Configure the NVIC for TIMx ########################################*/
-  /* Set Interrupt Group Priority */ 
-  //HAL_NVIC_SetPriority(TIM3_IRQn, 4, 0);
-
-    /* Enable the TIMx global Interrupt */
-  //HAL_NVIC_EnableIRQ(TIM3_IRQn);
-
-}

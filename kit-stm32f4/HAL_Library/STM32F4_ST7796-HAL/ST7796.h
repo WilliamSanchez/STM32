@@ -4,8 +4,8 @@
 #include "stm32f4xx_hal.h"
 #include "config_spi.h"
 
-#define Horizontal_line   480 //320 
-#define Vertical_line     320 //480
+#define Horizontal_line   320 //320
+#define Vertical_line     480//480;
 #define COL_ADDR_SET      0x2A
 #define ROW_ADDR_SET      0X2B
 #define MEM_WRT           0X2C
