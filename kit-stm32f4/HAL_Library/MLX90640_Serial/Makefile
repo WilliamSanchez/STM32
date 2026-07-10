@@ -49,9 +49,6 @@ SRCS =  main.c stm32f4xx_it.c \
        	stm32f4xx_hal_cortex.c \
 		stm32f4xx_hal_msp.c \
 		config_usart.c \
-		config_i2c.c \
-		MLX90640_API.c \
-		MLX90640_I2C_Driver.c \
         startup_stm32f411xe.s 
  
 

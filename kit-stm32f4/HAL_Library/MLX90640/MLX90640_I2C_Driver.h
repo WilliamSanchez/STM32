@@ -20,6 +20,10 @@
 #include <stdint.h>
 #include "MLX90640_API.h"
 
+#define min(a,b)((a)<(b) ? (a):(b))
+#define MAX_BUFFER_I2C              32
+
+
 #define I2C                         I2C1
 
  void MLX90640_I2CInit(void);

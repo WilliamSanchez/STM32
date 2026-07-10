@@ -19,6 +19,11 @@
 #include <math.h>
 #include <errno.h>
 
+#include "config_usart.h"
+#include <stdio.h>
+extern char debug[2024];
+extern uint8_t slaveAddr;
+
 static void ExtractVDDParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);
 static void ExtractPTATParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);
 static void ExtractGainParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);
@@ -771,8 +776,36 @@ static void ExtractVDDParameters(uint16_t *eeData, paramsMLX90640 *mlx90640)
     vdd25 = MLX90640_LS_BYTE(eeData[51]);
     vdd25 = ((vdd25 - 256) << 5) - 8192;
     
+    if(!(kVdd & 0x80))
+        kVdd -= 256;
+
     mlx90640->kVdd = 32 * kVdd;
     mlx90640->vdd25 = vdd25; 
+
+    int16_t rvdd=0;
+
+    uint16_t startAddress = 0x072A;
+
+    //MLX90640_I2CRead(slaveAddr,reg_vdd, 1, &rvdd);
+        uint8_t buffer[2];
+        uint8_t reg[2]; 
+        uint8_t lenReadData = 1;
+
+        reg[0] = startAddress >> 8;
+        reg[1] = startAddress & 0xFF;
+
+    i2c_received(slaveAddr, reg, 2, buffer, lenReadData*2);
+
+    rvdd = buffer[0]<< 8 | buffer[1];
+    if ((rvdd & 0x8000))
+        rvdd -= 65536;  
+    float vdd_real = 0.0;
+
+    vdd_real = (rvdd-vdd25)/(-3168);
+    memset(debug,0x00,2024);
+    sprintf(debug,"eeData[51]: %x kVdd: %d vdd25: %d, rvdd: %x, vdd real: %f\n\r",eeData[51], mlx90640->kVdd, mlx90640->vdd25, rvdd, vdd_real);
+    usart_send((uint8_t*)debug,strlen(debug));
+    
 }
 
 //------------------------------------------------------------------------------
